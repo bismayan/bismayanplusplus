@@ -5,13 +5,13 @@ I am closely following the tutorial in [this Youtube Video](https://www.youtube.
 
 ## Installation Steps:
 1. Install conda
-2. create an environment using the requirements file (replace env with a name)  
+2. create an environment using the environment Yaml file 
  ```bash    
-    conda create --name <env> --file requirements.txt
+    conda env create -f environment.yaml
 ```
 3. activate the conda environment  
  ```bash   
-    conda activate <env>
+    conda activate langchain_app1
 ```
 4. Run the app
 ```bash      

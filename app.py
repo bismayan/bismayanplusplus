@@ -1,5 +1,5 @@
 import os
-from openai_key import api_key
+
 import streamlit as st
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
@@ -16,7 +16,12 @@ def set_openai_key(ret_value: bool = False):
     Returns:
         str: Value of API Key if ret_value is True else None
     """
-    os.environ["OPENAI_API_KEY"] = api_key
+    if os.environ.get("OPENAI_API_KEY") is None:
+        try:
+            from openai_key import api_key
+            os.environ["OPENAI_API_KEY"] = api_key
+        except:
+            raise KeyError("OPENAI_API_KEY is not defined")
     if ret_value:
         return api_key
     else:
