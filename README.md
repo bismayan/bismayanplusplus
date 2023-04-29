@@ -4,14 +4,14 @@ Welcome to my (not) amazing Langchain app. Right now it generates a script of a 
 I am closely following the tutorial in [this Youtube Video](https://www.youtube.com/watch?v=MlK6SIjcjE8)
 
 ## Installation Steps:
-1. Install conda
-2. create an environment using the environment Yaml file 
- ```bash    
-    conda env create -f environment.yaml
-```
-3. activate the conda environment  
+1. Install conda and create an environment with python and pip
+2. activate the conda environment  
  ```bash   
-    conda activate langchain_app1
+    conda activate <env>
+```
+3. create an environment using the environment Yaml file 
+ ```bash    
+    pip install -r requirements.txt
 ```
 4. Run the app
 ```bash      
