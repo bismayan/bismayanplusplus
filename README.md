@@ -1,6 +1,6 @@
 # Welcome to Bismayan++
 
-Welcome to my (not) amazing Langchain app. Right now it generates a script of a youtube video.  
+Welcome to Bismayan ++ . It's a small Langchain app that generates tutorials using Langchain.
 I am closely following the tutorial in [this Youtube Video](https://www.youtube.com/watch?v=MlK6SIjcjE8)
 
 ## Installation Steps:
