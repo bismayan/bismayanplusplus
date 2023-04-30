@@ -30,58 +30,70 @@ def set_openai_key(ret_value: bool = False):
 
 
 def initialize_templates():
-    """Initializes title and script templates
+    """Initializes title and tut templates
 
     Returns:
-        langchain.prompts.PromptTemplate, langchain.prompts.PromptTemplate: Both the script and title templates
+        langchain.prompts.PromptTemplate, langchain.prompts.PromptTemplate: Both the tut and title templates
     """
     title_template = PromptTemplate(input_variables=['topic'],
-                                    template="Write me a Youtube video title about {topic}")
-    script_template = PromptTemplate(input_variables=['title', 'wikipedia_research'],
-                                     template="Write me a short 300 word Youtube Video script based on the title TITLE: {title}, \
+                                    template="Write me a article title about {topic}")
+    tut_template = PromptTemplate(input_variables=['title', 'wikipedia_research'],
+                                     template="Write me a 500 word article based on the title TITLE: {title}, \
                                         while also using this wikipedia research: {wikipedia_research}")
-    return script_template, title_template
+    tut_template2 = PromptTemplate(input_variables=['title', 'wikipedia_research', 'tut1'],
+                                     template="Complete the 500 word article based on the title TITLE: {title}, \
+                                        while also using this wikipedia research: {wikipedia_research} and the previous output {tut1}")
+    return title_template, tut_template, tut_template2
 
 
-def initialize_chain(title_template, script_template, t_memory, s_memory):
+def initialize_chain(temp,title_template, tut_template, tut_template2, title_memory, tut_memory, tut_memory2):
     """Returns the final Langchain Sequential Chain
 
     Args:
         title_template (PromptTemplate): Prompt to pass to Title Chain
-        script_template (PromptTemplate): Prompt to pass to Script Chain
+        tut_template (PromptTemplate): Prompt to pass to tut Chain
 
     Returns:
         SimpleSequentialChain: Returns the FInal LLM Chain with the Two LLMs chained
     """
-    llm = OpenAI(temperature=0.9)
-    title_chain = LLMChain(llm=llm, prompt=title_template, verbose=True, output_key="title", memory=t_memory)
-    script_chain = LLMChain(llm=llm, prompt=script_template, verbose=True, output_key="script", memory=s_memory)
-    return title_chain, script_chain
+    llm = OpenAI(temperature=temp)
+    title_chain = LLMChain(llm=llm, prompt=title_template, verbose=True, output_key="title", memory=title_memory)
+    tut_chain = LLMChain(llm=llm, prompt=tut_template, verbose=True, output_key="tut1", memory=tut_memory)
+    tut_chain_2 = LLMChain(llm=llm, prompt=tut_template2, verbose=True, output_key="tut2", memory=tut_memory2)
+    return title_chain, tut_chain, tut_chain_2
 
 
 def main():
-    script_template, title_template = initialize_templates()
+    
+    st.title("🤖 🤖 Welcome to Bismayan++! The (sometimes) Amazing Teacher Bot")
+    
+    title_template, tut_template, tut_template2 = initialize_templates()
     title_memory = ConversationBufferMemory(input_key='topic', memory_key='chat_history')
-    script_memory = ConversationBufferMemory(input_key='title', memory_key='chat_history')
-    title_chain, script_chain = initialize_chain(title_template, script_template, title_memory, script_memory)
+    tut_memory = ConversationBufferMemory(input_key='title', memory_key='chat_history')
+    tut_memory2 = ConversationBufferMemory(input_key='tut1', memory_key='chat_history')
+    temp= st.slider("Creativity", min_value=0.1, max_value=0.95, step=0.05, value=0.8)
+    title_chain, tut_chain, tut_chain2 = initialize_chain(temp,title_template, tut_template, tut_template2, 
+                                                 title_memory, tut_memory, tut_memory2)
     wiki= WikipediaAPIWrapper()
 
-
-    st.title("🤖 🤖 Welcome to Bismayan++!")
+    
     pr = st.text_input(
-        "Unlike my creator, I am somewhat intelligent. What would you like to get the script for?", value="")
+         "What would you like to Learn Today?", value="")
     if pr:
         with st.spinner(text="Working on it..."):
             title = title_chain.run(pr)
             wiki_research= wiki.run(pr)
-            script= script_chain.run(title=title, wikipedia_research= wiki_research)
+            tut1= tut_chain.run(title=title, wikipedia_research= wiki_research)
+            tut2= tut_chain2.run(title=title, wikipedia_research= wiki_research, tut1= tut1)
             st.write(title)
-            st.write(script)
+            st.write( " ". join([tut1,tut2]))
 
             with st.expander("Title History"):
                 st.info(title_memory.buffer)
-            with st.expander("Script History"):
-                st.info(script_memory.buffer)
+            with st.expander("Tutorial History 1"):
+                st.info(tut_memory.buffer)
+            with st.expander("Tutorial History 2"):
+                st.info(tut_memory2.buffer)    
             with st.expander("Wikipedia Research"):
                 st.info(wiki_research)
 
